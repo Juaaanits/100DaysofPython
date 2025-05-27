@@ -180,20 +180,10 @@ Run the script from your terminal: python password_manager.py
 
 Good luck!
 '''
-
-'''
 from tkinter import *
 from tkinter import messagebox
 from random import choice, randint, shuffle
-#import pyperclip
-import tkinter as tk
-from PIL import Image, ImageTk
-'''
-
-from tkinter import *
-from tkinter import messagebox
-from random import choice, randint, shuffle
-#import pyperclip
+import pyperclip
 
 
 #Part 2:Implementing Password Functionality
@@ -211,18 +201,26 @@ def generate_password():
     password_list += [choice(symbols) for _ in range(randint(2, 4))]
     shuffle(password_list)
     password = ''.join(password_list)
+    pyperclip.copy(password)  # Copy the password to clipboard
+    
+    password_entry.insert(0, password)  # Insert the password into the entry field
 
 def save():
-    website = website.entry.get()
-    email_username = email_username_label.get()
+    website = website_entry.get()
+    email_username = email_username_entry.get()
     password = password_entry.get()
 
     if len(password) == 0 or len(email_username) == 0 or len(website) == 0:
         messagebox.showwarning(title="Empty fields", message="Please don't leave any empty fields")
         return
-    
+    is_ok = messagebox.askokcancel(title=website, message=f"These are the details entered:\nEmail: {email_username}\nPassword: {password}\nIs it OK to save?")
+    if is_ok:
+        with open("data.txt", "a") as data_file:
+            data_file.write(f"{website} | {email_username} | {password}\n")
+            website_entry.delete(0, END)
+            password_entry.delete(0, END)
 
-
+# Part 1: Setting Up the GUI
 window = Tk()
 window.title("Password Manager")
 window.config(padx=25, pady=25)
@@ -247,8 +245,12 @@ add_button.grid(column=1, row=4, columnspan=2)
 
 website_entry = Entry(width=35)
 website_entry.grid(column=1, row=1, columnspan=2)
-email_username_label = Entry(width=35)
-email_username_label.grid(column=1, row=2, columnspan=2)    
+website_entry.focus()
+
+email_username_entry = Entry(width=35)
+email_username_entry.grid(column=1, row=2, columnspan=2)    
+email_username_entry.insert(0, "phillip@email.com")
+
 password_entry = Entry(width=22)
 password_entry.grid(column=1, row=3)
 

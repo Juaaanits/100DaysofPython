@@ -2,9 +2,21 @@ from tkinter import *
 from tkinter import messagebox
 from random import choice, randint, shuffle
 import pyperclip
+import json
 
-
-#Part 2:Implementing Password Functionality
+def find_password():
+    website = website_entry.get()
+    try:
+        with open("data.json", "r") as data_file:
+            data = json.load(data_file)
+            search_email = data[website]['email']
+            search_password = data[website]['password']
+            messagebox.showinfo(title=website.title(), message=f"Email: {search_email}\nPassword: {search_password}")
+    except FileNotFoundError:
+        messagebox.showerror(title="Error", message="No Data File Found")
+    except KeyError:
+        messagebox.showerror(title="Error", message="No details for the website exists")
+        
 def generate_password():
     letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
                'u', 'v',
@@ -14,14 +26,20 @@ def generate_password():
     numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
 
-    password_list = [choice(letters) for _ in range(randint(8,10))]
-    password_list += [choice(numbers) for _ in range(randint(2, 4))]
-    password_list += [choice(symbols) for _ in range(randint(2, 4))]
+    password_letters = [choice(letters) for _ in range(randint(8,10))]
+    password_symbols += [choice(numbers) for _ in range(randint(2, 4))]
+    password_numbers += [choice(symbols) for _ in range(randint(2, 4))]
+
+    password_list = password_letters + password_symbols + password_numbers
     shuffle(password_list)
-    password = ''.join(password_list)
-    pyperclip.copy(password)  # Copy the password to clipboard
     
+    password = ''.join(password_list)
     password_entry.insert(0, password)  # Insert the password into the entry field
+    pyperclip.copy(password)  # Copy the password to clipboard
+
+def clear_info():
+    website_entry.delete(0, END)
+    password_entry.delete(0, END)
 
 def save():
     website = website_entry.get()
